@@ -411,7 +411,7 @@
             <File>
               <FileName>dfu_ble_svc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>dfu_ble_svc.c</FilePath>
+              <FilePath>../dfu_ble_svc.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -459,7 +459,7 @@
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>main.c</FilePath>
+              <FilePath>../main.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -512,12 +512,12 @@
             <File>
               <FileName>Abstract.txt</FileName>
               <FileType>5</FileType>
-              <FilePath>Abstract.txt</FilePath>
+              <FilePath>../Abstract.txt</FilePath>
             </File>
             <File>
               <FileName>license.txt</FileName>
               <FileType>5</FileType>
-              <FilePath>license.txt</FilePath>
+              <FilePath>../license.txt</FilePath>
             </File>
           </Files>
         </Group>
