@@ -3,8 +3,8 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'dfu_dual_bank_ble_s110_pca10028' 
- * Target:  'nrf51422_xxac' 
+ * Project: 'bootloader_s120' 
+ * Target:  'nrf51822_xxaa' 
  */
 
 #ifndef RTE_COMPONENTS_H
