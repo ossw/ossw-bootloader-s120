@@ -161,6 +161,7 @@ static void ble_stack_init(bool init_softdevice)
     ble_enable_params_t ble_enable_params;
     memset(&ble_enable_params, 0, sizeof(ble_enable_params));
     ble_enable_params.gatts_enable_params.service_changed = IS_SRVC_CHANGED_CHARACT_PRESENT;
+    ble_enable_params.gap_enable_params.role = BLE_GAP_ROLE_PERIPH;
     err_code = sd_ble_enable(&ble_enable_params);
     APP_ERROR_CHECK(err_code);
     
