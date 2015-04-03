@@ -230,7 +230,7 @@
             <RoSelD>3</RoSelD>
             <RwSelD>3</RwSelD>
             <CodeSel>0</CodeSel>
-            <OptFeed>1</OptFeed>
+            <OptFeed>0</OptFeed>
             <NoZi1>0</NoZi1>
             <NoZi2>0</NoZi2>
             <NoZi3>0</NoZi3>
@@ -363,7 +363,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>BLE_STACK_SUPPORT_REQD __HEAP_SIZE=0 BOARD_PCA10028 S110 S120 BSP_DEFINES_ONLY NRF51 SOFTDEVICE_PRESENT</Define>
+              <Define>BLE_STACK_SUPPORT_REQD __HEAP_SIZE=0 BOARD_PCA10028 S110 BSP_DEFINES_ONLY NRF51 SOFTDEVICE_PRESENT</Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
             </VariousControls>
