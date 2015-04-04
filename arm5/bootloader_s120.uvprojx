@@ -504,6 +504,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>dfu_transport_ble.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\dfu_transport_ble.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -679,12 +684,6 @@
         </targetInfos>
       </component>
       <component Cclass="nRF_Libraries" Cgroup="DFU" Csub="dfu_bootloader_util" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="dfu_bootloader_util">
-        <package name="nRF_Libraries" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Libraries/" vendor="NordicSemiconductor" version="2.0.0"/>
-        <targetInfos>
-          <targetInfo name="nrf51822_xxaa" versionMatchMode="fixed"/>
-        </targetInfos>
-      </component>
-      <component Cclass="nRF_Libraries" Cgroup="DFU" Csub="dfu_transport" Cvariant="Ble" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="dfu_transport_Ble">
         <package name="nRF_Libraries" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Libraries/" vendor="NordicSemiconductor" version="2.0.0"/>
         <targetInfos>
           <targetInfo name="nrf51822_xxaa" versionMatchMode="fixed"/>
