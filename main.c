@@ -56,7 +56,7 @@
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                                       /**< Include the service_changed characteristic. For DFU this should normally be the case. */
 
-#define BOOTLOADER_BUTTON               BSP_BUTTON_3                                            /**< Led used to indicate that DFU is active. */
+#define BOOTLOADER_BUTTON               BUTTON_SELECT                                            /**< Led used to indicate that DFU is active. */
 
 #define APP_TIMER_PRESCALER             0                                                       /**< Value of the RTC1 PRESCALER register. */
 #define APP_TIMER_MAX_TIMERS            3                                                       /**< Maximum number of simultaneously created timers. */
