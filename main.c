@@ -45,7 +45,7 @@
 #include "app_scheduler.h"
 #include "app_timer_appsh.h"
 #include "nrf_error.h"
-#include "bsp.h"
+#include "bsp/bsp.h"
 #include "softdevice_handler_appsh.h"
 #include "pstorage_platform.h"
 #include "nrf_mbr.h"

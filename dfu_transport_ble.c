@@ -15,7 +15,7 @@
 #include "dfu_types.h"
 #include <stddef.h>
 #include <string.h>
-#include "boards.h"
+#include "bsp/boards.h"
 #include "nrf51.h"
 #include "nrf_sdm.h"
 #include "nrf_gpio.h"
@@ -43,8 +43,8 @@
 #define DFU_SERVICE_HANDLE                   0x000C                                                  /**< Handle of DFU service when DFU service is first service initialized. */
 #define BLE_HANDLE_MAX                       0xFFFF                                                  /**< Max handle value is BLE. */
 
-#define DEVICE_NAME                          "DfuTarg"                                               /**< Name of device. Will be included in the advertising data. */
-#define MANUFACTURER_NAME                    "NordicSemiconductor"                                   /**< Manufacturer. Will be passed to Device Information Service. */
+#define DEVICE_NAME                          "OSSW_DFU"                                               /**< Name of device. Will be included in the advertising data. */
+#define MANUFACTURER_NAME                    "OpenSource"                                   /**< Manufacturer. Will be passed to Device Information Service. */
 
 #define MIN_CONN_INTERVAL                    (uint16_t)(MSEC_TO_UNITS(15, UNIT_1_25_MS))             /**< Minimum acceptable connection interval (11.25 milliseconds). */
 #define MAX_CONN_INTERVAL                    (uint16_t)(MSEC_TO_UNITS(30, UNIT_1_25_MS))             /**< Maximum acceptable connection interval (15 milliseconds). */

@@ -10,7 +10,6 @@
 #ifndef RTE_COMPONENTS_H
 #define RTE_COMPONENTS_H
 
-#define BSP_DEFINES_ONLY
 #define S120
 #define SOFTDEVICE_PRESENT
 
