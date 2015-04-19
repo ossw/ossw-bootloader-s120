@@ -40,6 +40,33 @@
 #define BSP_BUTTON_2_MASK (1<<BSP_BUTTON_2)
 #define BSP_BUTTON_3_MASK (1<<BSP_BUTTON_3)
 
+#define SPI_OPERATING_FREQUENCY (0x02000000uL << (uint32_t)Freq_4Mbps)  /**< Slave clock frequency. */
+
+// SPI0. 
+#define SPI0_SCK     11u                                     /**< SPI clock GPIO pin number. */
+#define SPI0_MOSI    12u                                     /**< SPI Master Out Slave In GPIO pin number. */
+#define SPI0_MISO    9u                                      /**< SPI Master In Slave Out GPIO pin number. */
+#define SPI0_SS0     8u                                      /**< SPI Slave Select GPIO pin number for device 0 */
+#define SPI0_SS1     23u                                     /**< SPI Slave Select GPIO pin number for device 1 */
+
+// SPI1. 
+#define SPI1_SCK     31u        /* 15u //dev board */
+#define SPI1_MOSI    28u        /* 16u //dev board */
+#define SPI1_MISO    4u                                      
+#define SPI1_SS0     30u   
+
+#define LCD_VOLTAGE_REG   13u
+#define LCD_ENABLE       6u
+#define LCD_BACKLIGHT    7u
+
+
+#define EXT_FLASH_SPI_SS        SPI0_SS0
+
+#define TIMEOUT_COUNTER         0x3000uL                     /**< Timeout for SPI transaction in units of loop iterations. */
+
+extern uint32_t * p_spi0_base_address;
+extern uint32_t * p_spi1_base_address;
+
 //#define BUTTONS_MASK   0x001E0000
 /*
 #define RX_PIN_NUMBER  11
@@ -48,23 +75,6 @@
 #define RTS_PIN_NUMBER 8
 #define HWFC           true
 */
-
-/*
-#define SPIS_MISO_PIN  28    // SPI MISO signal. 
-#define SPIS_CSN_PIN   12    // SPI CSN signal. 
-#define SPIS_MOSI_PIN  25    // SPI MOSI signal. 
-#define SPIS_SCK_PIN   29    // SPI SCK signal. 
-*/
-
-//#define SPIM0_SCK_PIN       4     /**< SPI clock GPIO pin number. */
-//#define SPIM0_MOSI_PIN      1     /**< SPI Master Out Slave In GPIO pin number. */
-//#define SPIM0_MISO_PIN      3     /**< SPI Master In Slave Out GPIO pin number. */
-//#define SPIM0_SS_PIN        2     /**< SPI Slave Select GPIO pin number. */
-
-//#define SPIM1_SCK_PIN       15     /**< SPI clock GPIO pin number. */
-//#define SPIM1_MOSI_PIN      12     /**< SPI Master Out Slave In GPIO pin number. */
-//#define SPIM1_MISO_PIN      14     /**< SPI Master In Slave Out GPIO pin number. */
-//#define SPIM1_SS_PIN        13     /**< SPI Slave Select GPIO pin number. */
 
 /*
 // serialization APPLICATION board

@@ -49,6 +49,11 @@
 #include "softdevice_handler_appsh.h"
 #include "pstorage_platform.h"
 #include "nrf_mbr.h"
+#include "nrf_delay.h"
+#include "spi.h"
+//#include "ext_flash.h"
+#include "mlcd.h"
+
 
 #if BUTTONS_NUMBER < 1
 #error "Not enough buttons on board"
@@ -68,6 +73,10 @@
 
 #define SCHED_QUEUE_SIZE                20                                                      /**< Maximum number of events in the scheduler queue. */
 
+uint32_t * p_spi0_base_address;
+uint32_t * p_spi1_base_address;
+
+static uint8_t last_progress;
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -162,6 +171,57 @@ static void scheduler_init(void)
     APP_SCHED_INIT(SCHED_MAX_EVENT_DATA_SIZE, SCHED_QUEUE_SIZE);
 }
 
+static void spi_init(void)
+{
+    p_spi0_base_address = spi_master_init(SPI0, SPI_MODE0, false);
+    p_spi1_base_address = spi_master_init(SPI1, SPI_MODE0, false);
+}
+
+static uint8_t progress_bg_draw_func(uint8_t x, uint8_t y)
+{
+    uint32_t d = (72-x)*(72-x) + (84-y)*(84-y);
+    if(d>2800 && d < 4100){
+        return 1;
+    } else if (y<=125 && y>77 && x>56 && x<88) {
+        if (x>64 && x<80 && y<117) {
+            return 0;
+        } else {
+            return 1;
+        }
+    } else if (x+y > 110 && x-y < 34 && y<85 && !(x+y > 121 && x-y < 23 && y<78)) {
+        return 1;
+    }
+    return 0;
+}
+
+static uint8_t progress_draw_func(uint8_t x, uint8_t y)
+{
+    uint32_t d = (72-x)*(72-x) + (84-y)*(84-y);
+    if(d>2800 && d < 4100){
+        return 1;
+    } else if (y<=125 && y>77 && x>56 && x<88) {
+        return 1;
+    } else if (x+y > 110 && x-y < 34 && y<85) {
+        return 1;
+    }
+    return 0;
+}
+
+static void init_progress_notification() {
+    last_progress = 0;
+    mlcd_set_screen_with_func(progress_bg_draw_func);
+  
+    mlcd_display_on();
+    mlcd_backlight_on();
+}
+
+void bootloader_dfu_progress_update(uint32_t m_data_received, uint32_t m_image_size) {
+    uint8_t progress = m_data_received*67/m_image_size;
+    if(progress > last_progress) {
+        mlcd_set_lines_with_func(progress_draw_func, 117u-progress, progress-last_progress);
+        last_progress = progress;
+    }
+}
 
 /**@brief Function for bootloader main entry.
  */
@@ -184,6 +244,12 @@ int main(void)
     // Initialize.
     timers_init();
     buttons_init();
+    spi_init();
+    mlcd_init();
+    mlcd_power_on();
+		
+		// make seure lcd is working
+		nrf_delay_ms(10);
 
     (void)bootloader_init();
 
@@ -210,6 +276,7 @@ int main(void)
     
     if (dfu_start || (!bootloader_app_is_valid(DFU_BANK_0_REGION_START)))
     {
+				init_progress_notification();
         // Initiate an update of the firmware.
         err_code = bootloader_dfu_start();
         APP_ERROR_CHECK(err_code);

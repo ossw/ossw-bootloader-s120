@@ -47,11 +47,11 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\_build\</OutputDirectory>
-          <OutputName>bootloader_s120</OutputName>
+          <OutputName>ossw-bootloader-s120</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
-          <DebugInformation>0</DebugInformation>
+          <DebugInformation>1</DebugInformation>
           <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\_build\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
@@ -166,16 +166,16 @@
         </DebugOption>
         <Utilities>
           <Flash1>
-            <UseTargetDll>0</UseTargetDll>
-            <UseExternalTool>1</UseExternalTool>
+            <UseTargetDll>1</UseTargetDll>
+            <UseExternalTool>0</UseExternalTool>
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4099</DriverSelection>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -549,6 +549,56 @@
               <FileType>5</FileType>
               <FilePath>..\bsp\boards.h</FilePath>
             </File>
+            <File>
+              <FileName>bootloader.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bootloader.c</FilePath>
+            </File>
+            <File>
+              <FileName>bootloader.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\bootloader.h</FilePath>
+            </File>
+            <File>
+              <FileName>dfu_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\dfu_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>dfu_init_template.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\dfu_init_template.c</FilePath>
+            </File>
+            <File>
+              <FileName>dfu_dual_bank.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\dfu_dual_bank.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Libraries</GroupName>
+          <Files>
+            <File>
+              <FileName>mlcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mlcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>mlcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\mlcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>spi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\spi.h</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\spi.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -683,12 +733,6 @@
       </component>
       <component Cclass="nRF_Drivers" Cgroup="pstorage" Cvariant="default" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="pstorage_default">
         <package name="nRF_Drivers" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/" vendor="NordicSemiconductor" version="2.0.0"/>
-        <targetInfos>
-          <targetInfo name="nrf51822_xxaa" versionMatchMode="fixed"/>
-        </targetInfos>
-      </component>
-      <component Cclass="nRF_Libraries" Cgroup="DFU" Csub="dfu_bootloader" Cvariant="Dual_bank" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="dfu_bootloader_Dual_bank">
-        <package name="nRF_Libraries" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Libraries/" vendor="NordicSemiconductor" version="2.0.0"/>
         <targetInfos>
           <targetInfo name="nrf51822_xxaa" versionMatchMode="fixed"/>
         </targetInfos>
@@ -985,12 +1029,10 @@
         </targetInfos>
       </file>
       <file attr="config" category="source" name="bootloader_dfu\dfu_init_template.c" version="2.0.0">
-        <instance index="0">RTE\nRF_Libraries\nRF51822_xxAA\dfu_init_template.c</instance>
+        <instance index="0" removed="1">RTE\nRF_Libraries\nRF51822_xxAA\dfu_init_template.c</instance>
         <component Cclass="nRF_Libraries" Cgroup="DFU" Csub="dfu_bootloader" Cvariant="Dual_bank" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="dfu_bootloader_Dual_bank"/>
         <package name="nRF_Libraries" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Libraries/" vendor="NordicSemiconductor" version="2.0.0"/>
-        <targetInfos>
-          <targetInfo name="nrf51822_xxaa"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="header" name="bootloader_dfu\dfu_types.h" version="2.0.0">
         <instance index="0">RTE\nRF_Libraries\nRF51822_xxAA\dfu_types.h</instance>

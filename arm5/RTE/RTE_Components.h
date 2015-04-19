@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'bootloader_s120' 
+ * Project: 'ossw-bootloader-s120' 
  * Target:  'nrf51822_xxaa' 
  */
 
