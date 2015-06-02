@@ -43,7 +43,6 @@ static uint16_t                     m_image_crc;                /**< Calculated 
 static app_timer_id_t               m_dfu_timer_id;             /**< Application timer id. */
 static bool                         m_dfu_timed_out = false;    /**< Boolean flag value for tracking DFU timer timeout state. */
 
-static pstorage_handle_t            m_storage_handle_swap;      /**< Pstorage handle for the swap area (bank 1). Bank used when updating an application or bootloader without SoftDevice. */
 static pstorage_handle_t            m_storage_handle_app;       /**< Pstorage handle for the application area (bank 0). Bank used when updating a SoftDevice w/wo bootloader. Handle also used when swapping received application from bank 1 to bank 0. */
 static pstorage_handle_t          * mp_storage_handle_active;   /**< Pointer to the pstorage handle for the active bank for receiving of data packets. */
 
@@ -150,32 +149,6 @@ static void dfu_prepare_func_app_erase(uint32_t image_size)
 }
 
 
-/**@brief   Function for preparing swap before receiving application or bootloader image.
- *
- * @details This function will erase current swap area to ensure flash is ready for storage of the
- *          Application or Bootloader image. Upon erase complete a callback will be done.
- *          See \ref dfu_bank_prepare_t for further details.
- */
-static void dfu_prepare_func_swap_erase(uint32_t image_size)
-{
-    uint32_t err_code;
-
-    mp_storage_handle_active = &m_storage_handle_swap;
-
-    m_dfu_state = DFU_STATE_PREPARING;
-    err_code    = pstorage_raw_clear(&m_storage_handle_swap, DFU_IMAGE_MAX_SIZE_BANKED);
-    APP_ERROR_CHECK(err_code);
-}
-
-
-/**@brief   Function for handling behaviour when clear operation has completed.
- */
-static void dfu_cleared_func_swap(void)
-{
-    // Do nothing.
-}
-
-
 /**@brief   Function for handling behaviour when clear operation has completed.
  */
 static void dfu_cleared_func_app(void)
@@ -248,28 +221,15 @@ static uint32_t dfu_activate_sd(void)
  */
 static uint32_t dfu_activate_app(void)
 {
-    uint32_t err_code;
+    uint32_t            err_code = NRF_SUCCESS;
+    dfu_update_status_t update_status;
 
-    // Erase BANK 0.
-    err_code = pstorage_raw_clear(&m_storage_handle_app, m_start_packet.app_image_size);
-    APP_ERROR_CHECK(err_code);
+    memset(&update_status, 0, sizeof(dfu_update_status_t ));
+    update_status.status_code = DFU_UPDATE_APP_COMPLETE;
+    update_status.app_crc     = m_image_crc;
+    update_status.app_size    = m_start_packet.app_image_size;
 
-    err_code = pstorage_raw_store(&m_storage_handle_app,
-                                  (uint8_t *)m_storage_handle_swap.block_id,
-                                  m_start_packet.app_image_size,
-                                  0);
-
-    if (err_code == NRF_SUCCESS)
-    {
-        dfu_update_status_t update_status;
-
-        memset(&update_status, 0, sizeof(dfu_update_status_t ));
-        update_status.status_code = DFU_UPDATE_APP_COMPLETE;
-        update_status.app_crc     = m_image_crc;
-        update_status.app_size    = m_start_packet.app_image_size;
-
-        bootloader_dfu_update_process(update_status);
-    }
+    bootloader_dfu_update_process(update_status);
 
     return err_code;
 }
@@ -315,8 +275,6 @@ uint32_t dfu_init(void)
     }
 
     m_storage_handle_app.block_id  = DFU_BANK_0_REGION_START;
-    m_storage_handle_swap          = m_storage_handle_app;
-    m_storage_handle_swap.block_id = DFU_BANK_1_REGION_START;
 
     // Create the timer to monitor the activity by the peer doing the firmware update.
     err_code = app_timer_create(&m_dfu_timer_id,
@@ -376,33 +334,24 @@ uint32_t dfu_start_pkt_handle(dfu_update_packet_t * p_packet)
         return NRF_ERROR_DATA_SIZE;
     }
 
+    if (m_image_size > (DFU_IMAGE_MAX_SIZE_FULL))
+    {
+        return NRF_ERROR_DATA_SIZE;
+    }
+    m_functions.prepare  = dfu_prepare_func_app_erase;
+    m_functions.cleared  = dfu_cleared_func_app;
+    
     if (IS_UPDATING_SD(m_start_packet))
     {
-        if (m_image_size > (DFU_IMAGE_MAX_SIZE_FULL))
-        {
-            return NRF_ERROR_DATA_SIZE;
-        }
-        m_functions.prepare  = dfu_prepare_func_app_erase;
-        m_functions.cleared  = dfu_cleared_func_app;
         m_functions.activate = dfu_activate_sd;
+    }
+    else if (IS_UPDATING_BL(m_start_packet))
+    {
+        m_functions.activate = dfu_activate_bl;
     }
     else
     {
-        if (m_image_size > DFU_IMAGE_MAX_SIZE_BANKED)
-        {
-            return NRF_ERROR_DATA_SIZE;
-        }
-
-        m_functions.prepare = dfu_prepare_func_swap_erase;
-        m_functions.cleared = dfu_cleared_func_swap;
-        if (IS_UPDATING_BL(m_start_packet))
-        {
-            m_functions.activate = dfu_activate_bl;
-        }
-        else
-        {
-            m_functions.activate = dfu_activate_app;
-        }
+        m_functions.activate = dfu_activate_app;
     }
 
     switch (m_dfu_state)
@@ -792,7 +741,7 @@ uint32_t dfu_bl_image_swap(void)
     if (bootloader_settings.bl_image_size != 0)
     {
         uint32_t bl_image_start = (bootloader_settings.sd_image_size == 0) ?
-                                  DFU_BANK_1_REGION_START :
+                                  DFU_BANK_0_REGION_START :
                                   bootloader_settings.sd_image_start + 
                                   bootloader_settings.sd_image_size;
 
@@ -816,7 +765,7 @@ uint32_t dfu_bl_image_validate(void)
     if (bootloader_settings.bl_image_size != 0)
     {
         uint32_t bl_image_start = (bootloader_settings.sd_image_size == 0) ?
-                                  DFU_BANK_1_REGION_START :
+                                  DFU_BANK_0_REGION_START :
                                   bootloader_settings.sd_image_start +
                                   bootloader_settings.sd_image_size;
 
