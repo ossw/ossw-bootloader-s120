@@ -384,8 +384,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\dfu_dual_bank.c</PathWithFileName>
-      <FilenameWithoutPath>dfu_dual_bank.c</FilenameWithoutPath>
+      <PathWithFileName>..\dfu_single_bank.c</PathWithFileName>
+      <FilenameWithoutPath>dfu_single_bank.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
