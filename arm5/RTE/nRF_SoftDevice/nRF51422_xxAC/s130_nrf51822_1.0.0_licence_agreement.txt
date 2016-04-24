@@ -1,8 +1,8 @@
-S110/S120 license agreement
+S110/S120/S130 license agreement
 
 NORDIC SEMICONDUCTOR ASA SOFTDEVICE LICENSE AGREEMENT
 
-License Agreement for the Nordic Semiconductor ASA ("Nordic") S110 and S120 Bluetooth SoftDevice software packages ("SoftDevice").
+License Agreement for the Nordic Semiconductor ASA ("Nordic") S110, S120 and S130 Bluetooth SoftDevice software packages ("SoftDevice").
 
 You ("You" "Licensee") must carefully and thoroughly read this License Agreement ("Agreement"), and accept to adhere to this Agreement before
 downloading, installing and/or using any software or content in the SoftDevice provided herewith.
@@ -24,7 +24,7 @@ agreement to use or modify the SoftDevice for use on any wireless connectivity i
 Nordic retains full rights, title, and ownership to the SoftDevice and any and all patents, copyrights, trade secrets, trade names, trademarks, and
 other intellectual property rights in and to the SoftDevice.
 
-3. No Modifications or Reverse Engineering
+3.No Modifications or Reverse Engineering
 Licensee shall not, modify, reverse engineer, disassemble, decompile or otherwise attempt to discover the source code of any non-source code
 parts of the SoftDevice including, but not limited to pre-compiled hex files, binaries and object code.
 

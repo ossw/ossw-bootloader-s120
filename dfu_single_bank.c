@@ -14,7 +14,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "dfu.h"
-#include "dfu_types.h"
+#include <dfu_types.h>
 #include "dfu_bank_internal.h"
 #include "nrf.h"
 #include "nrf51.h"
@@ -144,7 +144,7 @@ static void dfu_prepare_func_app_erase(uint32_t image_size)
     // Doing a SoftDevice update thus current application must be cleared to ensure enough space
     // for new SoftDevice.
     m_dfu_state = DFU_STATE_PREPARING;
-    err_code    = pstorage_raw_clear(&m_storage_handle_app, m_image_size);
+    err_code    = pstorage_clear(&m_storage_handle_app, m_image_size);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -267,7 +267,7 @@ uint32_t dfu_init(void)
     m_init_packet_length = 0;
     m_image_crc          = 0;
 
-    err_code = pstorage_raw_register(&storage_module_param, &m_storage_handle_app);
+    err_code = pstorage_register(&storage_module_param, &m_storage_handle_app);
     if (err_code != NRF_SUCCESS)
     {
         m_dfu_state = DFU_STATE_INIT_ERROR;
@@ -424,7 +424,7 @@ uint32_t dfu_data_pkt_handle(dfu_update_packet_t * p_packet)
 
             p_data = (uint32_t *)p_packet->params.data_packet.p_data_packet;
 
-            err_code = pstorage_raw_store(mp_storage_handle_active,
+            err_code = pstorage_store(mp_storage_handle_active,
                                           (uint8_t *)p_data,
                                           data_length,
                                           m_data_received);
@@ -434,9 +434,6 @@ uint32_t dfu_data_pkt_handle(dfu_update_packet_t * p_packet)
             }
 
             m_data_received += data_length;
-						
-						// update progrss notification
-						bootloader_dfu_progress_update(m_data_received, m_image_size);
 
             if (m_data_received != m_image_size)
             {
@@ -694,7 +691,7 @@ uint32_t dfu_sd_image_swap(void)
         uint32_t img_block_start = boot_settings.sd_image_start + 2 * block_size;
         uint32_t sd_block_start  = sd_start + 2 * block_size;
         
-        if (SOFTDEVICE_INFORMATION->softdevice_size < boot_settings.sd_image_size)
+        if (SD_SIZE_GET(MBR_SIZE) < boot_settings.sd_image_size)
         {
             // This will clear a page thus ensuring the old image is invalidated before swapping.
             err_code = dfu_copy_sd((uint32_t *)(sd_start + block_size), 
@@ -802,7 +799,7 @@ uint32_t dfu_sd_image_validate(void)
         uint32_t img_block_start = bootloader_settings.sd_image_start + 2 * block_size;
         uint32_t sd_block_start  = sd_start + 2 * block_size;
 
-        if (SOFTDEVICE_INFORMATION->softdevice_size < bootloader_settings.sd_image_size)
+        if (SD_SIZE_GET(MBR_SIZE) < bootloader_settings.sd_image_size)
         {
             return NRF_ERROR_NULL;
         }

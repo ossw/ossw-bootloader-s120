@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "bootloader_types.h"
-#include "dfu_types.h"
+#include <dfu_types.h>
 
 /**@brief Function for initializing the Bootloader.
  * 
@@ -91,8 +91,6 @@ uint32_t bootloader_dfu_sd_update_continue(void);
  * @retval     NRF_SUCCESS If the final stage of SoftDevice update was successful. 
  */
 uint32_t bootloader_dfu_sd_update_finalize(void);
-
-void bootloader_dfu_progress_update(uint32_t m_data_received, uint32_t m_image_size);
 
 #endif // BOOTLOADER_H__
 

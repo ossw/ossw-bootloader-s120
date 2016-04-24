@@ -12,10 +12,9 @@
 
 #include "dfu_transport.h"
 #include "dfu.h"
-#include "dfu_types.h"
+#include <dfu_types.h>
 #include <stddef.h>
 #include <string.h>
-#include "bsp/boards.h"
 #include "nrf51.h"
 #include "nrf_sdm.h"
 #include "nrf_gpio.h"
@@ -36,20 +35,21 @@
 #include "bootloader.h"
 #include "dfu_ble_svc_internal.h"
 #include "nrf_delay.h"
+#include "ble_nus.h"
 
 #define DFU_REV_MAJOR                        0x00                                                    /** DFU Major revision number to be exposed. */
-#define DFU_REV_MINOR                        0x06                                                    /** DFU Minor revision number to be exposed. */
+#define DFU_REV_MINOR                        0x08                                                    /** DFU Minor revision number to be exposed. */
 #define DFU_REVISION                         ((DFU_REV_MAJOR << 8) | DFU_REV_MINOR)                  /** DFU Revision number to be exposed. Combined of major and minor versions. */
 #define DFU_SERVICE_HANDLE                   0x000C                                                  /**< Handle of DFU service when DFU service is first service initialized. */
 #define BLE_HANDLE_MAX                       0xFFFF                                                  /**< Max handle value is BLE. */
 
-#define DEVICE_NAME                          "OSSW_DFU"                                               /**< Name of device. Will be included in the advertising data. */
-#define MANUFACTURER_NAME                    "OpenSource"                                   /**< Manufacturer. Will be passed to Device Information Service. */
+#define DEVICE_NAME                          "OSSW_DFU"                                              /**< Name of device. Will be included in the advertising data. */
+#define MANUFACTURER_NAME                    "OpenSource"					                                   /**< Manufacturer. Will be passed to Device Information Service. */
 
 #define MIN_CONN_INTERVAL                    (uint16_t)(MSEC_TO_UNITS(15, UNIT_1_25_MS))             /**< Minimum acceptable connection interval (11.25 milliseconds). */
-#define MAX_CONN_INTERVAL                    (uint16_t)(MSEC_TO_UNITS(30, UNIT_1_25_MS))             /**< Maximum acceptable connection interval (15 milliseconds). */
+#define MAX_CONN_INTERVAL                    (uint16_t)(MSEC_TO_UNITS(50, UNIT_1_25_MS))             /**< Maximum acceptable connection interval (15 milliseconds). */
 #define SLAVE_LATENCY                        0                                                       /**< Slave latency. */
-#define CONN_SUP_TIMEOUT                     (4 * 100)                                               /**< Connection supervisory timeout (4 seconds). */
+#define CONN_SUP_TIMEOUT                     (6 * 100)                                               /**< Connection supervisory timeout (4 seconds). */
 
 #define APP_TIMER_PRESCALER                  0                                                       /**< Value of the RTC1 PRESCALER register. */
 
@@ -60,7 +60,6 @@
 #define APP_ADV_INTERVAL                     MSEC_TO_UNITS(25, UNIT_0_625_MS)                        /**< The advertising interval (25 ms.). */
 #define APP_ADV_TIMEOUT_IN_SECONDS           BLE_GAP_ADV_TIMEOUT_GENERAL_UNLIMITED                   /**< The advertising timeout in units of seconds. This is set to @ref BLE_GAP_ADV_TIMEOUT_GENERAL_UNLIMITED so that the advertisement is done as long as there there is a call to @ref dfu_transport_close function.*/
 #define APP_DIRECTED_ADV_TIMEOUT             50                                                       /**< number of direct advertisement (each lasting 1.28seconds). */
-#define PEER_ADDRESS_TYPE_INVALID            0xFF                                                    /**< Value indicating that no valid peer address exists. This will be the case when a private resolvable address is used in which case there is no address available but instead an IRK is present. */   
 #define PEER_ADDRESS_TYPE_INVALID            0xFF                                                    /**< Value indicating that no valid peer address exists. This will be the case when a private resolvable address is used in which case there is no address available but instead an IRK is present. */   
 
 #define SEC_PARAM_TIMEOUT                    30                                                      /**< Timeout for Pairing Request or Security Request (in seconds). */
@@ -80,6 +79,8 @@
 #define SD_IMAGE_SIZE_OFFSET                 0                                                       /**< Offset in start packet for the size information for SoftDevice. */
 #define BL_IMAGE_SIZE_OFFSET                 4                                                       /**< Offset in start packet for the size information for bootloader. */
 #define APP_IMAGE_SIZE_OFFSET                8                                                       /**< Offset in start packet for the size information for application. */
+
+static ble_nus_t                        m_nus;                                      /**< Structure to identify the Nordic UART Service. */
 
 
 /**@brief Packet type enumeration.
@@ -135,6 +136,15 @@ static uint32_t service_change_indicate()
                                              m_ble_peer_data.sys_serv_attr,
                                              sizeof(m_ble_peer_data.sys_serv_attr),
                                              BLE_GATTS_SYS_ATTR_FLAG_SYS_SRVCS);
+        if (err_code != NRF_SUCCESS)
+        {
+            return err_code;
+        }
+
+        err_code = sd_ble_gatts_sys_attr_set(m_conn_handle,
+                                             NULL,
+                                             0,
+                                             BLE_GATTS_SYS_ATTR_FLAG_USR_SRVCS);
         if (err_code != NRF_SUCCESS)
         {
             return err_code;
@@ -412,6 +422,7 @@ static void app_data_process(ble_dfu_t * p_dfu, ble_dfu_evt_t * p_evt)
     }
 
     uint8_t * p_data_packet = p_evt->evt.ble_dfu_pkt_write.p_data;
+    
     memcpy(mp_rx_buffer, p_data_packet, length);
 
     err_code = hci_mem_pool_rx_data_size_set(length);
@@ -681,7 +692,7 @@ static void advertising_start(void)
 
         if (m_ble_peer_data_valid)
         {
-            ble_gap_irk_t empty_irk = {0};
+            ble_gap_irk_t empty_irk = {{0}};
 
             if (memcmp(m_ble_peer_data.irk.irk, empty_irk.irk, sizeof(empty_irk.irk)) == 0)
             {
@@ -731,7 +742,6 @@ static void advertising_start(void)
     }
 }
 
-
 /**@brief Function for stopping advertising.
  */
 static void advertising_stop(void)
@@ -760,6 +770,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
+
             m_conn_handle    = p_ble_evt->evt.gap_evt.conn_handle;
             m_is_advertising = false;
             break;
@@ -919,6 +930,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     ble_conn_params_on_ble_evt(p_ble_evt);
     ble_dfu_on_ble_evt(&m_dfu, p_ble_evt);
+    ble_nus_on_ble_evt(&m_nus, p_ble_evt);
     on_ble_evt(p_ble_evt);
 }
 
@@ -965,6 +977,32 @@ static void service_error_handler(uint32_t nrf_error)
 }
 
 
+/**@brief Function for handling the data from the Nordic UART Service.
+ *
+ * @details This function will process the data received from the Nordic UART BLE Service and send
+ *          it to the UART module.
+ *
+ * @param[in] p_nus    Nordic UART Service structure.
+ * @param[in] p_data   Data to be send to UART module.
+ * @param[in] length   Length of the data.
+ */
+/**@snippet [Handling the data received over BLE] */
+static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length)
+{
+		command_buffer_append(p_data, length);
+  /*  for (uint32_t i = 0; i < length; i++)
+    {
+        while(app_uart_put(p_data[i]) != NRF_SUCCESS);
+    }
+    while(app_uart_put('\n') != NRF_SUCCESS);*/
+}
+/**@snippet [Handling the data received over BLE] */
+
+void nus_data_send_response(uint8_t * p_data, uint16_t length) {
+		ble_nus_string_send(&m_nus, p_data, length);
+}
+	
+
 /**@brief     Function for initializing services that will be used by the application.
  */
 static void services_init(void)
@@ -981,6 +1019,16 @@ static void services_init(void)
 
     err_code = ble_dfu_init(&m_dfu, &dfu_init_obj);
 
+    APP_ERROR_CHECK(err_code);
+	
+		// Initialize UART over BLE
+    ble_nus_init_t nus_init;
+    
+    memset(&nus_init, 0, sizeof(nus_init));
+
+    nus_init.data_handler = nus_data_handler;
+    
+    err_code = ble_nus_init(&m_nus, &nus_init);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -1019,7 +1067,7 @@ uint32_t dfu_transport_update_start(void)
         return err_code;
     }
 
-    err_code = dfu_ble_get_peer_data(&m_ble_peer_data);
+    err_code = dfu_ble_peer_data_get(&m_ble_peer_data);
     if (err_code == NRF_SUCCESS)
     {
         m_ble_peer_data_valid = true;
